@@ -51,14 +51,19 @@
             opcoes.forEach(opcao => {
                 const card = document.createElement('button');
                 card.className = 'card-opcao';
+                
+                // Montamos o interior do botão com a imagem recebida do banco
                 card.innerHTML = `
-                    <span class="opcao-nome">${opcao.name}</span>
-                    <span class="seta">➔</span>
+                    <div class="opcao-conteudo">
+                        ${opcao.imagem_url ? `<img src="${opcao.imagem_url}" alt="${opcao.name}" class="opcao-img">` : ''}
+                        <span class="opcao-nome">${opcao.name}</span>
+                    </div>
+                    
                 `;
-
+                
                 // Quando toca, computa o voto e muda de página
                 card.onclick = () => computarVoto(opcao.id, opcao.votos);
-
+                
                 container.appendChild(card);
             });
         }
@@ -73,7 +78,7 @@
                 
                 // SALVA NO NAVEGADOR: Diz que este celular já votou
                 localStorage.setItem('usuario_ja_votou', 'true');
-
+                
                 // Redireciona imediatamente para os resultados
                 
                 window.location.href = 'resultados.html';
