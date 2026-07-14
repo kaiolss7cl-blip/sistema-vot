@@ -1,0 +1,155 @@
+    /* Reseta margens e define fontes modernas */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent; /* Remove o flash azul ao tocar */
+    align-items: center;
+}
+
+:root {
+            /* DEFINIÇÃO DAS VARIÁVEIS DE COR */
+            
+            /* Tons de Azul */
+            --azul-claro: #73bced;
+            --azul-medio: #437fd7;
+            --azul-escuro: #153fbe;
+            
+            /* Tons de Vermelho */
+            --roxo-suave: #f08282;
+            --roxo-vibrante: #ff0404;
+            --roxo-profundo: #810202;
+            
+            /* Branco/Neutro */
+            --branco-puro: #ffffff;
+            --branco-gelo: #f0f5ff; /* Um branco com leve toque azul */
+    
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            
+            /* CONSTRUÇÃO DO MESH GRADIENT */
+            /* Usamos radial-gradient sobrepostos em posições diferentes */
+            background-color: var(--branco-gelo); /* Cor de fundo base */
+            background-image: 
+                radial-gradient(at 10% 10%, var(--azul-claro) 0, transparent 40%),
+                radial-gradient(at 90% 10%, var(--roxo-suave) 0, transparent 40%),
+                radial-gradient(at 50% 50%, var(--branco-puro) 0, transparent 60%), /* Ponto de branco central */
+                radial-gradient(at 10% 90%, var(--roxo-vibrante) 0, transparent 50%),
+                radial-gradient(at 90% 90%, var(--azul-medio) 0, transparent 50%),
+                radial-gradient(at 30% 60%, var(--azul-escuro) 0, transparent 30%), /* Ponto escuro mais sutil */
+                radial-gradient(at 70% 30%, var(--roxo-profundo) 0, transparent 30%); /* Ponto profundo mais sutil */
+            background-attachment: fixed;
+            background-size: 200% 200%; /* Aumenta o tamanho para animação */
+            animation: meshAnimation 20s ease infinite; /* Adiciona movimento */
+        }
+                /* ANIMAÇÃO DO MESH GRADIENT */
+        @keyframes meshAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+.app-container {
+    width: 100%;
+    max-width: 450px; /* Limita a largura para parecer um app de celular */
+    margin-top: 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    width: 90%;
+    border-radius: 20px;
+    background: rgba(202, 240, 250, 0.8);
+    backdrop-filter: blur(20px) brightness(100%);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    margin: 2% 4%;
+    padding: 20px;
+}
+.header h1 {
+    color: #1e293b;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: #64748b;
+    font-size: 15px;
+}
+
+/* Container que segura os botões */
+.grid-opcoes {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Espaço entre cada um dos 5 botões */
+}
+
+/* Estilo do botão/card focado em toque mobile */
+.card-opcao {
+    border: 2px solid transparent; 
+    border-radius: 20px; 
+    background-image: 
+      linear-gradient(#ffffff, #ffffff), 
+      linear-gradient(to right, rgba(255, 0, 150, 0.8), rgba(0, 204, 255, 0.8));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    width: 80%;
+    transition: transform 0.1s ease, border-color 0.2s ease;
+}
+
+/* Feedback visual quando o usuário mantém o dedo pressionado */
+.card-opcao:active {
+    transform: scale(0.98);
+    border-color: #3b82f6; /* Borda fica azul */
+    background-color: #f8fafc;
+}
+
+.opcao-nome {
+    font-size: 18px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.seta {
+    color: #94a3b8;
+    font-size: 18px;
+}
+/* --- Estilos do Rodapé --- */
+.rodape {
+    display: block;
+    text-align: center;
+    margin-top: 40px;      /* Garante um espaço confortável após a lista de votação */
+    padding: 20px 10px;
+    border-top: 1px solid #e2e8f0; /* Uma linha bem sutil para separar o conteúdo */
+    width: 100%;
+    max-width: 450px;      /* Alinha com a largura máxima do seu app mobile */
+    margin-left: auto;
+    margin-right: auto;
+    background: rgba(184, 216, 224, 0.5);
+    backdrop-filter: blur(20px) brightness(100%);
+
+}
+
+.rodape-logo {
+    height: 40px;          /* Define uma altura controlada para a logo não quebrar o layout */
+    width: auto;           /* Mantém a proporção largura/altura da imagem */
+    object-fit: contain;
+    margin-bottom: 8px;    /* Espaço entre a imagem e o texto de direitos reservados */
+    opacity: 0.8;          /* Deixa a logo levemente suave (opcional) */
+}
+
+.rodape-texto {
+    font-size: 12px;       /* Texto menor, típico de rodapé */
+    color: #ffffff;        /* Tom de cinza agradável e discreto */
+    font-weight: 500;
+}

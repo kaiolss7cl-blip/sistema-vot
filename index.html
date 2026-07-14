@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votação - ABC</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <main class="app-container">
+        <header class="header">
+            <h1>Qual a sua escolha?</h1>
+            <p>Toque em uma das opções abaixo para votar:</p>
+        </header>
+
+        <section id="opcoes-container" class="grid-opcoes">
+            <div class="loader">Carregando opções...</div>
+        </section>
+    </main>
+
+    <footer class="rodape">
+        <img src="abc.png" alt="Logo da Empresa" class="rodape-logo">
+        <p class="rodape-texto">Todos os direitos reservados por Caio Luís &copy; 2026</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        if (localStorage.getItem('usuario_ja_votou') === 'true') {
+            window.location.href = 'resultados.html';
+        }
+        
+        // Função que busca as 5 opções e monta a tela
+        async function renderizarOpcoes() {
+            const { data: opcoes, error } = await supabaseClient
+                .from('opcoes_voto')
+                .select('*');
+
+            if (error) {
+                console.error('Erro:', error);
+                return;
+            }
+
+            const container = document.getElementById('opcoes-container');
+            container.innerHTML = ''; // Remove o texto de carregando
+
+            // Passa por cada uma das 5 opções criadas no banco
+            opcoes.forEach(opcao => {
+                const card = document.createElement('button');
+                card.className = 'card-opcao';
+                card.innerHTML = `
+                    <span class="opcao-nome">${opcao.name}</span>
+                    <span class="seta">➔</span>
+                `;
+
+                // Quando toca, computa o voto e muda de página
+                card.onclick = () => computarVoto(opcao.id, opcao.votos);
+
+                container.appendChild(card);
+            });
+        }
+
+        async function computarVoto(id, votosAtuais) {
+            const { error } = await supabaseClient
+                .from('opcoes_voto')
+                .update({ votos: votosAtuais + 1 })
+                .eq('id', id);
+
+            if (!error) {
+                
+                // SALVA NO NAVEGADOR: Diz que este celular já votou
+                localStorage.setItem('usuario_ja_votou', 'true');
+
+                // Redireciona imediatamente para os resultados
+                
+                window.location.href = 'resultados.html';
+            } else {
+                alert('Erro ao computar voto. Tente novamente.');
+            }
+        }
+
+        renderizarOpcoes();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados - ABC</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      
+        /* Ajustes específicos de layout para acomodar o gráfico mantendo o visual mobile */
+        .container-grafico {
+            width: 90%;
+            margin: 0 auto 20px auto;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+           
+            /* Altura dinâmica ideal para que as barras fiquem confortáveis de ler (ótimo se aumentar para 20 opções) */
+            min-height: 450px; 
+            position: relative;
+        }
+        .loader-resultados {
+            text-align: center;
+            color: #64748b;
+            font-size: 16px;
+            padding: 40px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="app-container">
+        <header class="header">
+            <div style="text-align: center; width: 100%;">
+                <h1>Resultados Parciais</h1>
+                <p>Veja como está a votação em tempo real</p>
+            </div>
+        </header>
+        
+        <section class="container-grafico">
+            <div id="loading" class="loader-resultados">Carregando gráfico...</div>
+            <canvas id="graficoVotos"></canvas>
+        </section>
+
+    </main>
+    <footer class="rodape">
+        <img src="abc.png" alt="Logo da Empresa" class="rodape-logo">
+        <p class="rodape-texto">Todos os direitos reservados por Caio Luís &copy; 2026</p>
+    </footer>
+    <script src="app.js"></script>
+    
+    <script>
+        let meuGrafico = null;
+
+async function renderizarGrafico() {
+    try {
+        const { data: opcoes, error } = await supabaseClient
+            .from('opcoes_voto')
+            .select('name, votos')
+            .order('votos', { ascending: false });
+
+        if (error) {
+            console.error('Erro ao buscar dados:', error);
+            document.getElementById('loading').innerText = 'Erro ao carregar dados.';
+            return;
+        }
+
+        document.getElementById('loading').style.display = 'none';
+
+        const nomes = opcoes.map(item => item.name);
+        const votos = opcoes.map(item => item.votos);
+
+        const ctx = document.getElementById('graficoVotos').getContext('2d');
+
+        if (meuGrafico) {
+            meuGrafico.destroy();
+        }
+
+        // ==========================================
+        // CREATING ELEGANT GRADIENTS (MÁGICA VISUAL)
+        // ==========================================
+        // Criamos dois gradientes horizontais (da esquerda para a direita: x0=0 para x1=ctx.canvas.width)
+        
+        // 1. Gradiente Premium para o Vencedor (Tons de roxo profundo a azul escuro, combinando com seu CSS)
+        const gradienteVencedor = ctx.createLinearGradient(0, 0, 400, 0);
+        gradienteVencedor.addColorStop(0, '#ff0404');   // var(--roxo-profundo)
+        gradienteVencedor.addColorStop(0.5, '#153fbe'); // var(--azul-escuro)
+        gradienteVencedor.addColorStop(0.75, '#437fd7');   // var(--azul-medio)
+         gradienteVencedor.addColorStop(1, '#73bced');
+
+        // 2. Gradiente Suave para as outras opções (Azul metálico moderno)
+        const gradientePadrao = ctx.createLinearGradient(0, 0, 400, 0);
+        gradientePadrao.addColorStop(0, '#ff0404');   // var(--azul-medio)
+        gradientePadrao.addColorStop(1, '#153fbe');   // var(--azul-claro)
+
+
+        meuGrafico = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: nomes,
+                datasets: [{
+                    label: 'Votos',
+                    data: votos,
+                    // Aplica dinamicamente os gradientes sofisticados
+                    backgroundColor: nomes.map((_, index) => 
+                        index === 0 ? gradienteVencedor : gradientePadrao
+                    ),
+                    borderRadius: 20, // Totalmente arredondado nas pontas (estilo pílula, super moderno)
+                    borderWidth: 0,
+                    barThickness: 18, // Barras ligeiramente mais finas e elegantes
+                    maxBarThickness: 25
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                
+                // ==========================================
+                // ANIMATION CONFIGURATIONS (MOVIMENTO CHIQUE)
+                // ==========================================
+                animation: {
+                    duration: 2000, // 2 segundos de animação suave ao entrar
+                    easing: 'easeOutElastic', // Efeito elástico sutil e elegante no final da barra
+                    delay: (context) => context.dataIndex * 100 // Efeito cascata (uma barra surge após a outra)
+                },
+
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)', // Fundo dark chique para o balão de informação
+                        titleFont: { size: 14, weight: '600' },
+                        bodyFont: { size: 13 },
+                        padding: 12,
+                        cornerRadius: 10,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: { color: '#64748b' },
+                        grid: { color: 'rgba(226, 232, 240, 0.4)' } // Linhas de fundo bem discretas
+                    },
+                    y: {
+                        ticks: {
+                            color: '#1e293b',
+                            font: { size: 13, weight: '600' }
+                        },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+    } catch (err) {
+        console.error('Erro crítico:', err);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', renderizarGrafico);
+    </script>
+</body>
+</html>
