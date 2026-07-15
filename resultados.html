@@ -64,7 +64,7 @@ async function renderizarGrafico() {
         const { data: opcoes, error } = await supabaseClient
             .from('opcoes_voto')
             .select('name, votos')
-            .order('votos', { ascending: false });
+            .order('votos', { ascending: false });  
 
         if (error) {
             console.error('Erro ao buscar dados:', error);
@@ -110,7 +110,7 @@ async function renderizarGrafico() {
                     data: votos,
                     // Aplica dinamicamente os gradientes sofisticados
                     backgroundColor: nomes.map((_, index) => 
-                        index === 0 ? gradienteVencedor : gradientePadrao
+                        index < 3 ? gradienteVencedor : gradientePadrao
                     ),
                     borderRadius: 20, // Totalmente arredondado nas pontas (estilo pílula, super moderno)
                     borderWidth: 0,
