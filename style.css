@@ -148,3 +148,36 @@
     color: #ffffff;        /* Tom de cinza agradável e discreto */
     font-weight: 500;
 }
+
+
+
+
+/* Estilo para a imagem */
+.opcao-img {
+    width: 250px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+
+.opcao-conteudo {
+    display: flex;
+    flex-direction: column; /* Coloca Imagem -> Título -> Frase um abaixo do outro */
+    align-items: center; /* Alinha o conteúdo à esquerda */
+    gap: 8px;               /* Espaço entre os elementos */
+    width: 100%;
+    text-align: center;
+}
+
+.opcao-textos {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.opcao-frase {
+    font-size: 13px;
+    color: #64748b;
+    font-style: italic;
+    margin-top: 4px;
+}

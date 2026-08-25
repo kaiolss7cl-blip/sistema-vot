@@ -29,43 +29,46 @@
 
     <script src="app.js"></script>
     <script>
-        if (localStorage.getItem('usuario_ja_votou') === 'true') {
+      /*  if (localStorage.getItem('usuario_ja_votou') === 'true') {
             window.location.href = 'resultados.html';
-        }
+        }*/
         
         // Função que busca as 5 opções e monta a tela
         async function renderizarOpcoes() {
-            const { data: opcoes, error } = await supabaseClient
-                .from('opcoes_voto')
-                .select('*');
+    const { data: opcoes, error } = await supabaseClient
+        .from('opcoes_voto')
+        .select('*');
 
-            if (error) {
-                console.error('Erro:', error);
-                return;
-            }
+    if (error) {
+        console.error('Erro:', error);
+        return;
+    }
 
-            const container = document.getElementById('opcoes-container');
-            container.innerHTML = ''; // Remove o texto de carregando
+    const container = document.getElementById('opcoes-container');
+    container.innerHTML = ''; // Remove o texto de carregando
 
-            // Passa por cada uma das 5 opções criadas no banco
-            opcoes.forEach(opcao => {
-                const card = document.createElement('button');
-                card.className = 'card-opcao';
-                
-                // Montamos o interior do botão com a imagem recebida do banco
-                card.innerHTML = `
-                    <div class="opcao-conteudo">
-                        ${opcao.imagem_url ? `<img src="${opcao.imagem_url}" alt="${opcao.name}" class="opcao-img">` : ''}
-                        <span class="opcao-nome">${opcao.name}</span>
-                    </div>
-                    
-                `;
-                
-                // Quando toca, computa o voto e muda de página
-                card.onclick = () => computarVoto(opcao.id, opcao.votos);
-                
-                container.appendChild(card);
-            });
+    // Passa por cada uma das opções
+   opcoes.forEach(opcao => {
+    const card = document.createElement('button');
+    card.className = 'card-opcao';
+    
+    // Imprime no console do navegador para confirmar se o dado está vindo do banco
+    console.log('Dados da opção:', opcao);
+
+    const fraseAluno = opcao['text_alunos'];
+
+    card.innerHTML = `
+        <div class="opcao-conteudo">
+            ${opcao.imagem_url ? `<img src="${opcao.imagem_url}" alt="${opcao.name}" class="opcao-img">` : ''}
+            <div class="opcao-textos">
+                <span class="opcao-nome">${opcao.name}</span>
+                ${fraseAluno ? `<p class="opcao-frase">"${fraseAluno}"</p>` : ''}
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(card);
+});
         }
 
         async function computarVoto(id, votosAtuais) {
@@ -77,11 +80,11 @@
             if (!error) {
                 
                 // SALVA NO NAVEGADOR: Diz que este celular já votou
-                localStorage.setItem('usuario_ja_votou', 'true');
+                /*localStorage.setItem('usuario_ja_votou', 'true');
                 
                 // Redireciona imediatamente para os resultados
                 
-                window.location.href = 'resultados.html';
+                window.location.href = 'resultados.html';*/
             } else {
                 alert('Erro ao computar voto. Tente novamente.');
             }
