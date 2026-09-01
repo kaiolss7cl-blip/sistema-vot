@@ -28,70 +28,75 @@
     </footer>
 
     <script src="app.js"></script>
-    <script>
-        if (localStorage.getItem('usuario_ja_votou') === 'true') {
-            window.location.href = 'resultados.html';
-        }
-        
-        // Função que busca as 5 opções e monta a tela
-        async function renderizarOpcoes() {
-    const { data: opcoes, error } = await supabaseClient
-        .from('opcoes_voto')
-        .select('*');
+<script>
+    if (localStorage.getItem('usuario_ja_votou') === 'true') {
+        window.location.href = 'resultados.html';
+    }
+    
+    // Função que busca as opções e monta a tela
+    async function renderizarOpcoes() {
+        const { data: opcoes, error } = await supabaseClient
+            .from('opcoes_voto')
+            .select('*');
 
-    if (error) {
-        console.error('Erro:', error);
-        return;
+        if (error) {
+            console.error('Erro ao buscar opções:', error);
+            return;
+        }
+
+        const container = document.getElementById('opcoes-container');
+        container.innerHTML = ''; // Remove o loader
+
+        opcoes.forEach(opcao => {
+            const card = document.createElement('button');
+            card.className = 'card-opcao';
+            
+            const fraseAluno = opcao['text_alunos'];
+
+            card.innerHTML = `
+                <div class="opcao-conteudo">
+                    ${opcao.imagem_url ? `<img src="${opcao.imagem_url}" alt="${opcao.name}" class="opcao-img">` : ''}
+                    <div class="opcao-textos">
+                        <span class="opcao-nome">${opcao.name}</span>
+                        ${fraseAluno ? `<p class="opcao-frase">"${fraseAluno}"</p>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Evento de clique vinculado corretamente
+            card.onclick = () => {
+                // Desabilita os botões para evitar cliques duplos
+                document.querySelectorAll('.card-opcao').forEach(btn => btn.disabled = true);
+                computarVoto(opcao.id, opcao.votos || 0);
+            };
+
+            container.appendChild(card);
+        });
     }
 
-    const container = document.getElementById('opcoes-container');
-    container.innerHTML = ''; // Remove o texto de carregando
+    async function computarVoto(id, votosAtuais) {
+        const { error } = await supabaseClient
+            .from('opcoes_voto')
+            .update({ votos: votosAtuais + 1 })
+            .eq('id', id);
 
-    // Passa por cada uma das opções
-   opcoes.forEach(opcao => {
-    const card = document.createElement('button');
-    card.className = 'card-opcao';
-    
-    // Imprime no console do navegador para confirmar se o dado está vindo do banco
-    console.log('Dados da opção:', opcao);
-
-    const fraseAluno = opcao['text_alunos'];
-
-    card.innerHTML = `
-        <div class="opcao-conteudo">
-            ${opcao.imagem_url ? `<img src="${opcao.imagem_url}" alt="${opcao.name}" class="opcao-img">` : ''}
-            <div class="opcao-textos">
-                <span class="opcao-nome">${opcao.name}</span>
-                ${fraseAluno ? `<p class="opcao-frase">"${fraseAluno}"</p>` : ''}
-            </div>
-        </div>
-    `;
-    
-    container.appendChild(card);
-});
+        if (!error) {
+            // Salva no navegador que já votou
+            localStorage.setItem('usuario_ja_votou', 'true');
+            
+            // Redireciona para os resultados
+            window.location.href = 'resultados.html';
+        } else {
+            console.error('Erro Supabase:', error);
+            alert('Erro ao computar voto. Tente novamente.');
+            
+            // Reabilita os botões em caso de falha
+            document.querySelectorAll('.card-opcao').forEach(btn => btn.disabled = false);
         }
+    }
 
-        async function computarVoto(id, votosAtuais) {
-            const { error } = await supabaseClient
-                .from('opcoes_voto')
-                .update({ votos: votosAtuais + 1 })
-                .eq('id', id);
-
-            if (!error) {
-                
-                // SALVA NO NAVEGADOR: Diz que este celular já votou
-                localStorage.setItem('usuario_ja_votou', 'true');
-                
-                // Redireciona imediatamente para os resultados
-                
-                window.location.href = 'resultados.html';
-            } else {
-                alert('Erro ao computar voto. Tente novamente.');
-            }
-        }
-
-        renderizarOpcoes();
-    </script>
+    renderizarOpcoes();
+</script>
 </body>
 
 </html>
